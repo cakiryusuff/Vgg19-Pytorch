@@ -38,8 +38,7 @@ class Vgg19(nn.Module):
       blocks = nn.Sequential(
           nn.Conv2d(in_planes, out_planes, kernel_size = 3, padding = 1, bias = False),
           nn.ReLU(inplace = True),
-          nn.BatchNorm2d(out_planes)
-          )
+          nn.BatchNorm2d(out_planes))
       return blocks
 
     def forward(self, x):
