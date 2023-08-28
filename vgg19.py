@@ -5,7 +5,8 @@ Created on Fri Aug 25 20:00:24 2023
 @author: cakir
 """
 
-import torch.nn as nn
+from torch import nn, Tensor
+from torchvision.ops import Conv2dNormActivation
 
 class Vgg19(nn.Module):
     def __init__(self, num_classes = 1000):
@@ -29,21 +30,18 @@ class Vgg19(nn.Module):
     def _make_layer(self, planes):
       layers = []
       for i in range(len(self.planes) - 1):
-          layers.append(self.layer(planes[i], planes[i + 1]))
+          layers.append(Conv2dNormActivation(planes[i], planes[i + 1],
+                                             kernel_size = 3, padding = 1,
+                                             norm_layer = nn.BatchNorm2d,
+                                             activation_layer = nn.ReLU))
           if i in [1, 3, 7, 11, 15]:
-            layers.append(nn.MaxPool2d(3, 2))
+            layers.append(nn.MaxPool2d(3, 2, padding = 1))
       return (nn.Sequential(*layers))
 
-    def layer(self, in_planes, out_planes):
-      blocks = nn.Sequential(
-          nn.Conv2d(in_planes, out_planes, kernel_size = 3, padding = 1, bias = False),
-          nn.ReLU(inplace = True),
-          nn.BatchNorm2d(out_planes))
-      return blocks
-
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
       x = self.avgPool(self.network(x))
       x = x.view(x.size()[0], -1)
       x = self.fc(x)
       x = nn.functional.softmax(x, dim = 1)
+
       return x
