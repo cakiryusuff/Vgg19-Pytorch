@@ -32,8 +32,8 @@ class Vgg19(nn.Module):
       for i in range(len(self.planes) - 1):
           layers.append(Conv2dNormActivation(planes[i], planes[i + 1],
                                              kernel_size = 3, padding = 1,
-                                             norm_layer = nn.BatchNorm2d,
-                                             activation_layer = nn.ReLU))
+                                             norm_layer = nn.BatchNorm2d, bias = False,
+                                             activation_layer = nn.ReLU, inplace = True))
           if i in [1, 3, 7, 11, 15]:
             layers.append(nn.MaxPool2d(3, 2, padding = 1))
       return (nn.Sequential(*layers))
